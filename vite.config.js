@@ -1,10 +1,16 @@
 // Vite 构建配置文件
 import { defineConfig } from 'vite'
-// 导入 Vue 插件
+// 导入 Vite 配置定义函数
 import vue from '@vitejs/plugin-vue'
+// 导入 Vue 插件：支持单文件组件
 
-// 导出配置
+// GitHub Pages 部署路径：仓库为 techdou/dl-handbook
+// 设为 '/dl-handbook/' 保证 /images /audio 等静态绝对路径资源在 Pages 子路径下正确加载
+const ghPagesBase = '/dl-handbook/'
+
 export default defineConfig({
+  // 资源基础路径，本地开发时为 '/'，生产部署到 Pages 时为仓库子路径
+  base: ghPagesBase,
   // 注册插件：Vue 单文件组件支持
   plugins: [vue()],
   // 构建选项

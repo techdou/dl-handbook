@@ -66,7 +66,8 @@ const audioSrc = computed(() => {
   const filename = audioMap[props.topicId]
   // 如果没有对应的音频文件，返回空
   if (!filename) return ''
-  return `/audio/${filename}`
+  // 拼接 import.meta.env.BASE_URL，适配 GitHub Pages 子路径部署，避免音频 404
+  return `${import.meta.env.BASE_URL}audio/${filename}`
 })
 
 // 是否有对应的音频文件
