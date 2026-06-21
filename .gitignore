@@ -1,0 +1,64 @@
+# ---- 依赖 ----
+node_modules
+.pnp
+.pnp.js
+
+# ---- 构建产物 ----
+dist
+dist-ssr
+*.local
+
+# ---- 密钥 / 环境变量（切勿入库）----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ---- 日志 ----
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ---- AI / Agent / Skill 开发辅助文件（本地工具，不入库）----
+.claude
+.tongyi
+.aider*
+CLAUDE.md
+AGENTS.md
+cursor.rules
+.cursorrules
+
+# TTS 朗读 skill 及其配置 / 产物（本地生成工具链）
+tts-skill
+tts-config
+output
+
+# 原始 PDF 解析数据（305M，本地素材，不入库）
+deeplearning
+temp-check
+
+# 生成的 TTS 音频（由 tts-skill 重新生成）
+public/audio
+public/*/audio
+
+# ---- 开发截图 / 临时文件 ----
+screenshot-*.png
+*.tmp
+*.bak
+
+# ---- 编辑器 / 系统 ----
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
