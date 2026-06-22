@@ -168,12 +168,16 @@ function closeSidebar() {
   /* 默认透明 */
   transition: opacity var(--transition-normal);
   /* 透明度过渡 */
+  /* 关键：透明状态下不拦截触摸/点击，否则移动端会盖在内容上导致所有点击失效 */
+  pointer-events: none;
 }
 
 /* 遮罩层激活状态 */
 .sidebar-overlay.active {
   opacity: 1;
   /* 显示 */
+  /* 激活时才允许接收点击（点击空白处关闭侧边栏） */
+  pointer-events: auto;
 }
 
 /* 主内容区域 */
