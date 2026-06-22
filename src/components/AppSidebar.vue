@@ -608,13 +608,21 @@ function getBookProgress(book) {
 /* 响应式：手机端 */
 @media (max-width: 768px) {
   .sidebar {
+    /* 顶部留出 mobile-header 的高度（含安全区），避免被 header 遮挡 */
+    top: calc(52px + env(safe-area-inset-top, 0px));
+    /* 手机端按设备宽度展开，而非 0px 的 CSS 变量 */
+    width: min(280px, 80vw);
     transform: translateX(-100%);
-    /* 默认移出屏幕左侧 */
+    /* 默认移出屏幕左侧（width 恢复后此位移才真正生效） */
+    /* 关键：关闭状态下禁用指针事件，避免侧边栏内部溢出元素
+       叠在 mobile-header 之上拦截汉堡按钮的点击。 */
+    pointer-events: none;
   }
 
-  /* 展开状态：滑入屏幕 */
+  /* 展开状态：滑入屏幕并恢复交互 */
   .sidebar.open {
     transform: translateX(0);
+    pointer-events: auto;
   }
 }
 </style>

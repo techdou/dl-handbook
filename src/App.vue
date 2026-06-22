@@ -94,7 +94,8 @@ function closeSidebar() {
   /* 纯白背景 */
   border-bottom: 1px solid var(--rule);
   /* 暖灰底部分隔线 */
-  z-index: 100;
+  /* 高于侧边栏（z-index 200），保证汉堡按钮在侧边栏展开时也始终可点 */
+  z-index: 201;
   /* 确保在最上层 */
   align-items: center;
   /* 垂直居中 */
