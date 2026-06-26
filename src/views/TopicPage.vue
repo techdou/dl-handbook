@@ -9,24 +9,24 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 // 导入 marked 库：Markdown 转 HTML 渲染器
 import { marked } from 'marked'
 // 导入组件
-import FormulaBlock from '../components/FormulaBlock.vue'
+import FormulaBlock from '../components/handbook/FormulaBlock.vue'
 // 公式渲染组件
-import D3Demo from '../components/D3Demo.vue'
-// D3 可视化演示组件
-import QuizModal from '../components/QuizModal.vue'
+import ReactDemoHost from '../components/handbook/ReactDemoHost.vue'
+// React/visx 交互演示承载组件
+import QuizModal from '../components/handbook/QuizModal.vue'
 // 测验弹窗组件
-import PageNav from '../components/PageNav.vue'
+import PageNav from '../components/handbook/PageNav.vue'
 // 上/下一页导航组件
-import AudioPlayer from '../components/AudioPlayer.vue'
+import AudioPlayer from '../components/handbook/AudioPlayer.vue'
 // 音频播报播放器组件
-import TermPopover from '../components/TermPopover.vue'
+import TermPopover from '../components/handbook/TermPopover.vue'
 // 术语解释气泡组件
 // 导入术语表数据
 import glossary from '../data/glossary.js'
 // 导入书籍图片映射数据
 import bookImages from '../data/bookImages.js'
 // 书籍插图展示组件
-import BookFigure from '../components/BookFigure.vue'
+import BookFigure from '../components/handbook/BookFigure.vue'
 // 导入知识点数据
 import { allTopics } from '../data/topics.js'
 
@@ -258,7 +258,7 @@ function openQuiz() {
       <!-- 区域标题 -->
       <h2 class="section-title">🔬 交互演示</h2>
       <!-- D3 演示组件 -->
-      <D3Demo :demoId="topic.demoId" />
+      <ReactDemoHost :demoId="topic.demoId" />
     </section>
 
     <!-- 测验浮窗按钮（固定在右下角） -->

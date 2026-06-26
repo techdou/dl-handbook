@@ -9,13 +9,23 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-spring/web": "^10.1.1",
+    "@visx/axis": "^4.0.0",
+    "@visx/grid": "^4.0.0",
+    "@visx/group": "^4.0.0",
+    "@visx/responsive": "^4.0.0",
+    "@visx/scale": "^4.0.0",
+    "@visx/shape": "^4.0.0",
     "d3": "^7.9.0",
     "katex": "^0.17.0",
     "marked": "^18.0.5",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "vue": "^3.5.34",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.3",
     "@vitejs/plugin-vue": "^6.0.6",
     "vite": "^8.0.12"
   }

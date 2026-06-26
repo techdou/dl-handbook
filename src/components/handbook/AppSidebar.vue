@@ -9,7 +9,7 @@ import { ref, computed, watch } from 'vue'
 // 从 Vue Router 导入路由工具
 import { useRoute, useRouter } from 'vue-router'
 // 导入知识点数据
-import { books, allTopics } from '../data/topics.js'
+import { books, allTopics } from '../../data/topics.js'
 
 // 获取当前路由信息
 const route = useRoute()

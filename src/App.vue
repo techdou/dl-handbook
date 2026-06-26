@@ -9,7 +9,7 @@ import { ref, provide } from 'vue'
 // 从 Vue Router 导入路由相关工具
 import { useRouter } from 'vue-router'
 // 导入侧边栏导航组件
-import AppSidebar from './components/AppSidebar.vue'
+import AppSidebar from './components/handbook/AppSidebar.vue'
 
 // 获取路由实例，用于编程式导航
 const router = useRouter()

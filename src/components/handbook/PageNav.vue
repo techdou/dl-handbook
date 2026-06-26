@@ -7,7 +7,7 @@
 // 从 Vue 导入工具
 import { computed } from 'vue'
 // 导入知识点数据
-import { allTopics } from '../data/topics.js'
+import { allTopics } from '../../data/topics.js'
 
 // 定义组件接收的属性
 const props = defineProps({
