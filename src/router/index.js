@@ -1,14 +1,21 @@
 // Vue Router 路由配置文件：定义所有页面路由规则
 import { createRouter, createWebHashHistory } from 'vue-router'
 // 从 vue-router 导入路由创建函数和 Hash 模式历史管理
-import HomePage from '../views/HomePage.vue'
-// 导入首页组件：展示四本书的总览和学习路径
-import LearningPath from '../views/LearningPath.vue'
-// 导入学习路径图组件：知识点依赖关系可视化
-import TopicPage from '../views/TopicPage.vue'
-// 导入知识点详情页组件：展示单个知识点的完整内容
 import { allTopics } from '../data/topics.js'
 // 导入所有知识点数据，用于动态生成路由
+
+// 页面组件全部按需加载（动态 import）：
+// 首页不再把 TopicPage（连带 KaTeX/marked）、LearningPath（连带 D3）
+// 以及全部 React 演示打进首屏，各视图独立分包、访问时才下载
+const HomePage = () => import('../views/HomePage.vue')
+// 首页组件：展示四本书的总览和学习路径
+const LearningPath = () => import('../views/LearningPath.vue')
+// 学习路径图组件：知识点依赖关系可视化
+const TopicPage = () => import('../views/TopicPage.vue')
+// 知识点详情页组件：展示单个知识点的完整内容
+
+// 站点基础标题：路由切换时拼接知识点标题
+const BASE_TITLE = '深度学习入门 Handbook'
 
 const routes = [
   // 路由配置数组：定义 URL 路径与组件的映射关系
@@ -42,6 +49,13 @@ const router = createRouter({
     return { top: 0 }
     // 每次切换页面自动滚动到顶部
   }
+})
+
+// 路由切换后更新页面标题：分享/收藏/多标签页时能看出当前知识点
+router.afterEach((to) => {
+  const topic = allTopics.find(t => `/topic/${t.id}` === to.path)
+  // 知识点页显示「知识点标题 · 站点名」，其余页面只显示站点名
+  document.title = topic ? `${topic.title} · ${BASE_TITLE}` : BASE_TITLE
 })
 
 export default router
