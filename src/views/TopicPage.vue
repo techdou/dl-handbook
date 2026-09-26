@@ -25,8 +25,8 @@ import glossary from '../data/glossary.js'
 import bookImages from '../data/bookImages.js'
 // 书籍插图展示组件
 import BookFigure from '../components/handbook/BookFigure.vue'
-// 导入知识点数据
-import { allTopics } from '../data/topics.js'
+// 导入知识点数据与依赖关系
+import { allTopics, topicDependencies } from '../data/topics.js'
 // 导入学习进度共享状态：测验通过后立即响应刷新
 import { isCompleted as isTopicCompleted, markCompleted } from '../composables/useProgress.js'
 
@@ -52,6 +52,24 @@ const topic = computed(() => {
 const isCompleted = computed(() => {
   // 从响应式进度状态读取，测验通过后按钮文案立即变化
   return isTopicCompleted(props.topicId)
+})
+
+// 前置知识点：依赖数据里指向当前主题的那些（学习它之前建议先学的）
+const prereqTopics = computed(() => {
+  if (!topic.value) return []
+  return topicDependencies
+    .filter(d => d.target === props.topicId)
+    .map(d => allTopics.find(t => t.id === d.source))
+    .filter(Boolean)
+})
+
+// 后续知识点：以当前主题为前置的那些（学完可以继续学的）
+const nextTopics = computed(() => {
+  if (!topic.value) return []
+  return topicDependencies
+    .filter(d => d.source === props.topicId)
+    .map(d => allTopics.find(t => t.id === d.target))
+    .filter(Boolean)
 })
 
 // 获取当前知识点所属书籍的信息
@@ -244,6 +262,30 @@ function openQuiz() {
       <p class="topic-subtitle">{{ topic.subtitle }}</p>
     </header>
 
+    <!-- 前置/后续知识导航：复用学习路径图的依赖数据 -->
+    <nav v-if="prereqTopics.length || nextTopics.length" class="topic-links">
+      <!-- 前置知识点 -->
+      <div v-if="prereqTopics.length" class="link-row">
+        <span class="link-label">🧭 前置</span>
+        <router-link
+          v-for="t in prereqTopics"
+          :key="t.id"
+          :to="`/topic/${t.id}`"
+          class="topic-chip"
+        >{{ t.title }}</router-link>
+      </div>
+      <!-- 后续知识点 -->
+      <div v-if="nextTopics.length" class="link-row">
+        <span class="link-label">➡️ 进阶</span>
+        <router-link
+          v-for="t in nextTopics"
+          :key="t.id"
+          :to="`/topic/${t.id}`"
+          class="topic-chip"
+        >{{ t.title }}</router-link>
+      </div>
+    </nav>
+
     <!-- 音频播报播放器 -->
     <AudioPlayer :topicId="topicId" :title="topic.title" />
 
@@ -268,6 +310,11 @@ function openQuiz() {
     <section class="intro-section" @click="onContentClick" @keydown="onContentKeydown">
       <!-- 引言文字（衬线字体，大字号），v-html 渲染使术语可点击 -->
       <p class="intro-text" v-html="renderIntro(topic.intro)"></p>
+    </section>
+
+    <!-- 一句话总结：复习时最先看的一块 -->
+    <section v-if="topic.summary" class="summary-section">
+      <p class="summary-text">📌 {{ topic.summary }}</p>
     </section>
 
     <!-- 书籍插图区域：展示对应书籍章节的示意图 -->
@@ -472,6 +519,96 @@ function openQuiz() {
   /* 靛青浅底 */
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   /* 右侧小圆角 */
+}
+
+/* 前置/后续知识导航 */
+.topic-links {
+  margin-bottom: var(--space-6);
+  /* 下方间距 */
+  display: flex;
+  /* 纵向排列两行 */
+  flex-direction: column;
+  gap: var(--space-2);
+  /* 行间距 */
+}
+
+/* 导航行 */
+.link-row {
+  display: flex;
+  /* 水平排列标签与芯片 */
+  flex-wrap: wrap;
+  /* 芯片多时换行 */
+  align-items: center;
+  /* 垂直居中 */
+  gap: var(--space-2);
+  /* 间距 */
+}
+
+/* 导航行标签 */
+.link-label {
+  font-family: var(--font-sans);
+  /* 无衬线 */
+  font-size: 0.78rem;
+  /* 小字号 */
+  color: var(--ink-3);
+  /* 三级墨色 */
+  flex-shrink: 0;
+  /* 不被压缩 */
+}
+
+/* 知识点芯片链接 */
+.topic-chip {
+  font-family: var(--font-sans);
+  /* 无衬线 */
+  font-size: 0.78rem;
+  /* 小字号 */
+  color: var(--accent);
+  /* 靛青文字 */
+  border: 1px solid var(--rule);
+  /* 暖灰描边 */
+  border-radius: 999px;
+  /* 胶囊形 */
+  padding: 2px 10px;
+  /* 内边距 */
+  text-decoration: none;
+  /* 去下划线 */
+  transition: all var(--transition-fast);
+  /* 过渡动画 */
+}
+
+/* 芯片悬停效果 */
+.topic-chip:hover {
+  border-color: var(--accent);
+  /* 靛青描边 */
+  background: var(--accent-soft);
+  /* 靛青浅底 */
+}
+
+/* 一句话总结卡 */
+.summary-section {
+  margin-bottom: var(--space-8);
+  /* 下方间距 */
+  padding: var(--space-4) var(--space-5);
+  /* 内边距 */
+  border: 1px dashed var(--accent);
+  /* 靛青虚线框 */
+  border-radius: var(--radius-md);
+  /* 圆角 */
+  background: var(--paper-card);
+  /* 卡片底色 */
+}
+
+/* 总结文字 */
+.summary-text {
+  font-family: var(--font-serif);
+  /* 衬线字体 */
+  font-size: 1rem;
+  /* 字号 */
+  color: var(--ink);
+  /* 墨黑 */
+  line-height: 1.8;
+  /* 行高 */
+  margin: 0;
 }
 
 /* 引言文字 */

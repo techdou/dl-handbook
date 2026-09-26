@@ -1,6 +1,6 @@
 <!--
   LearningPath.vue — 学习路径图
-  功能：用 D3.js 可视化展示 19 个知识点的依赖关系和学习路径
+  功能：用 D3.js 可视化展示 21 个知识点的依赖关系和学习路径
   设计：学术笔记本风格，节点=知识点，边=依赖关系，已完成节点高亮
 -->
 <script setup>
@@ -10,8 +10,8 @@ import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 // 导入 D3.js
 import * as d3 from 'd3'
-// 导入知识点数据
-import { books, allTopics } from '../data/topics.js'
+// 导入知识点数据（含依赖关系 topicDependencies，与主题页前置导航共用）
+import { books, allTopics, topicDependencies } from '../data/topics.js'
 // 导入学习进度共享状态：测验通过后路径图节点/连线立即刷新
 import { isCompleted, useCompletedIds } from '../composables/useProgress.js'
 
@@ -23,33 +23,8 @@ const svgContainer = ref(null)
 // 窗口宽度
 const containerWidth = ref(900)
 
-// 知识点依赖关系定义
-// 每条边表示 [源] → [目标] 的学习依赖
-const dependencies = [
-  // Book 1 内部依赖链
-  { source: 'perceptron', target: 'neural-network' },
-  { source: 'neural-network', target: 'backpropagation' },
-  { source: 'backpropagation', target: 'training' },
-  { source: 'training', target: 'cnn' },
-  { source: 'cnn', target: 'mnist' },
-  // Book 2 依赖 Book 1
-  { source: 'backpropagation', target: 'computation-graph' },
-  { source: 'computation-graph', target: 'autograd' },
-  { source: 'autograd', target: 'layers' },
-  { source: 'layers', target: 'optimizer' },
-  // Book 3 依赖 Book 1
-  { source: 'neural-network', target: 'word2vec' },
-  { source: 'word2vec', target: 'rnn' },
-  { source: 'rnn', target: 'lstm' },
-  { source: 'lstm', target: 'seq2seq' },
-  { source: 'seq2seq', target: 'attention' },
-  // Book 4 相对独立
-  { source: 'rl-basics', target: 'mdp' },
-  { source: 'mdp', target: 'q-learning' },
-  { source: 'q-learning', target: 'dqn' },
-  // 跨书推荐依赖
-  { source: 'training', target: 'rl-basics' }
-]
+// 知识点依赖关系：从数据层导入，每条边表示 [源] → [目标] 的学习依赖
+const dependencies = topicDependencies
 
 // 获取知识点是否已完成：isCompleted 来自响应式共享进度状态（见顶部导入）
 

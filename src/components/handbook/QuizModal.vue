@@ -214,6 +214,12 @@ function isWrongSelection(index) {
               </div>
             </div>
 
+            <!-- 答案解析：提交后显示，无论对错都能加深理解 -->
+            <div v-if="answered && currentQuestion.explanation" class="answer-explain">
+              <span class="explain-label">💡 解析</span>
+              <span class="explain-text">{{ currentQuestion.explanation }}</span>
+            </div>
+
             <!-- 操作按钮区域 -->
             <div class="action-area">
               <!-- 提交答案按钮 -->
@@ -404,6 +410,38 @@ function isWrongSelection(index) {
   background: var(--accent-soft);
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* 答案解析框 */
+.answer-explain {
+  margin-top: 14px;
+  /* 与选项的间距 */
+  padding: 10px 14px;
+  /* 内边距 */
+  background: var(--paper-soft, #f7f5ef);
+  /* 浅纸底色 */
+  border-left: 3px solid var(--accent);
+  /* 靛青装饰条 */
+  border-radius: 0 6px 6px 0;
+  /* 右侧圆角 */
+  font-family: var(--font-sans);
+  /* 无衬线 */
+  font-size: 0.82rem;
+  /* 小字号 */
+  line-height: 1.7;
+  /* 行高 */
+  color: var(--ink-2);
+  /* 二级墨色 */
+}
+
+/* 解析标签 */
+.explain-label {
+  font-weight: 700;
+  /* 加粗 */
+  color: var(--accent);
+  /* 靛青 */
+  margin-right: 6px;
+  /* 与正文的间距 */
 }
 
 /* 已选中 */

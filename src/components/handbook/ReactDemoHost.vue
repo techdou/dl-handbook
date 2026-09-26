@@ -2,7 +2,7 @@
   ReactDemoHost.vue - Vue 页面里的 React demo 挂载桥。
   Vue 只负责生命周期和容器，交互状态与 SVG 渲染完全交给 React demo。
   演示组件按需加载：滚动到演示区域附近才动态 import 对应组件，
-  全部 19 个演示与 React 生态不再打进首屏 JS，且每个演示独立分包。
+  全部演示组件与 React 生态不再打进首屏 JS，且每个演示独立分包。
 -->
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue'
