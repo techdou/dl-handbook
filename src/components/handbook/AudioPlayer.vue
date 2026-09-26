@@ -40,25 +40,25 @@ const isMuted = ref(false)
 
 // 音频文件路径映射：知识点 ID → 文件名
 const audioMap = {
-  'perceptron': '01_perceptron.wav',
-  'neural-network': '02_neural_network.wav',
-  'backpropagation': '03_backpropagation.wav',
-  'training': '04_training.wav',
-  'cnn': '05_cnn.wav',
-  'mnist': '06_mnist.wav',
-  'computation-graph': '07_computation_graph.wav',
-  'autograd': '08_autograd.wav',
-  'layers': '09_layers.wav',
-  'optimizer': '10_optimizer.wav',
-  'word2vec': '11_word2vec.wav',
-  'rnn': '12_rnn.wav',
-  'lstm': '13_lstm.wav',
-  'seq2seq': '14_seq2seq.wav',
-  'attention': '15_attention.wav',
-  'rl-basics': '16_rl_basics.wav',
-  'mdp': '17_mdp.wav',
-  'q-learning': '18_q_learning.wav',
-  'dqn': '19_dqn.wav'
+  'perceptron': '01_perceptron.mp3',
+  'neural-network': '02_neural_network.mp3',
+  'backpropagation': '03_backpropagation.mp3',
+  'training': '04_training.mp3',
+  'cnn': '05_cnn.mp3',
+  'mnist': '06_mnist.mp3',
+  'computation-graph': '07_computation_graph.mp3',
+  'autograd': '08_autograd.mp3',
+  'layers': '09_layers.mp3',
+  'optimizer': '10_optimizer.mp3',
+  'word2vec': '11_word2vec.mp3',
+  'rnn': '12_rnn.mp3',
+  'lstm': '13_lstm.mp3',
+  'seq2seq': '14_seq2seq.mp3',
+  'attention': '15_attention.mp3',
+  'rl-basics': '16_rl_basics.mp3',
+  'mdp': '17_mdp.mp3',
+  'q-learning': '18_q_learning.mp3',
+  'dqn': '19_dqn.mp3'
 }
 
 // 计算音频文件路径
