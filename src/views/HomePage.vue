@@ -10,14 +10,11 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 // 导入书籍和知识点数据
 import { books, allTopics } from '../data/topics.js'
+// 导入学习进度共享状态：测验通过后首页进度立即刷新
+import { isCompleted } from '../composables/useProgress.js'
 
 // 获取路由实例
 const router = useRouter()
-
-// 判断知识点是否已完成
-function isCompleted(topicId) {
-  return localStorage.getItem(`dl-completed-${topicId}`) === 'true'
-}
 
 // 计算总学习进度
 const overallProgress = computed(() => {

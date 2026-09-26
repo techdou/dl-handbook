@@ -39,6 +39,8 @@ const answered = ref(false)
 const correctCount = ref(0)
 // 是否全部答对
 const allCorrect = ref(false)
+// 是否已答完全部题目（允许有错题时进入重试界面）
+const finished = ref(false)
 // 用户的选择历史记录
 const userAnswers = ref([])
 
@@ -92,6 +94,9 @@ function nextQuestion() {
       allCorrect.value = true
       // 触发通过事件
       emit('passed')
+    } else {
+      // 有错题：进入重试界面（否则弹窗会卡在最后一题无法重试）
+      finished.value = true
     }
   }
 }
@@ -104,6 +109,7 @@ function retryQuiz() {
   answered.value = false
   correctCount.value = 0
   allCorrect.value = false
+  finished.value = false
   userAnswers.value = []
 }
 
@@ -174,19 +180,20 @@ function isWrongSelection(index) {
             </button>
           </div>
 
-          <!-- 题目内容区域 -->
-          <div v-else-if="currentQuestion" class="question-area">
+          <!-- 题目内容区域（答完后切换到恭喜/重试界面） -->
+          <div v-else-if="currentQuestion && !finished" class="question-area">
             <!-- 题目文字 -->
             <h4 class="question-text">{{ currentQuestion.question }}</h4>
 
             <!-- 选项列表 -->
             <div class="options-list" role="radiogroup">
-              <!-- 遍历所有选项 -->
+              <!-- 遍历所有选项（tabindex + keydown 让键盘用户也能作答） -->
               <div
                 v-for="(option, idx) in currentQuestion.options"
                 :key="idx"
                 class="option-item"
                 role="radio"
+                tabindex="0"
                 :aria-checked="selectedAnswer === idx ? 'true' : 'false'"
                 :class="{
                   selected: selectedAnswer === idx && !answered,
@@ -194,6 +201,8 @@ function isWrongSelection(index) {
                   wrong: isWrongSelection(idx)
                 }"
                 @click="selectOption(idx)"
+                @keydown.enter.prevent="selectOption(idx)"
+                @keydown.space.prevent="selectOption(idx)"
               >
                 <!-- 选项字母标识 -->
                 <span class="option-letter">{{ String.fromCharCode(65 + idx) }}</span>
@@ -387,6 +396,14 @@ function isWrongSelection(index) {
 .option-item:hover:not(.correct):not(.wrong) {
   border-color: var(--accent);
   background: var(--accent-soft);
+}
+
+/* 选项键盘聚焦：与悬停一致的提示，保证 Tab 作答可见 */
+.option-item:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* 已选中 */

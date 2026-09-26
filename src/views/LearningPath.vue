@@ -5,13 +5,15 @@
 -->
 <script setup>
 // 从 Vue 导入工具
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 // 从 Vue Router 导入
 import { useRouter } from 'vue-router'
 // 导入 D3.js
 import * as d3 from 'd3'
 // 导入知识点数据
 import { books, allTopics } from '../data/topics.js'
+// 导入学习进度共享状态：测验通过后路径图节点/连线立即刷新
+import { isCompleted, useCompletedIds } from '../composables/useProgress.js'
 
 // 获取路由实例
 const router = useRouter()
@@ -49,10 +51,7 @@ const dependencies = [
   { source: 'training', target: 'rl-basics' }
 ]
 
-// 获取知识点是否已完成
-function isCompleted(topicId) {
-  return localStorage.getItem(`dl-completed-${topicId}`) === 'true'
-}
+// 获取知识点是否已完成：isCompleted 来自响应式共享进度状态（见顶部导入）
 
 // 计算完成统计
 const stats = computed(() => {
@@ -60,6 +59,9 @@ const stats = computed(() => {
   const completed = allTopics.filter(t => isCompleted(t.id)).length
   return { total, completed, percent: Math.round((completed / total) * 100) }
 })
+
+// 进度状态变化时重绘 D3 路径图（节点填充、连线样式、勾号）
+watch(useCompletedIds(), () => renderPath())
 
 // 书籍颜色映射
 const bookColors = {

@@ -10,6 +10,8 @@ import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 // 导入知识点数据
 import { books, allTopics } from '../../data/topics.js'
+// 导入学习进度共享状态：测验通过后侧边栏进度立即刷新
+import { isCompleted } from '../../composables/useProgress.js'
 
 // 获取当前路由信息
 const route = useRoute()
@@ -72,11 +74,8 @@ function isActive(topicId) {
   return currentTopicId.value === topicId
 }
 
-// 判断某个知识点是否已完成学习（存储在 localStorage）
-function isCompleted(topicId) {
-  // 从本地存储读取完成状态
-  return localStorage.getItem(`dl-completed-${topicId}`) === 'true'
-}
+// 判断某个知识点是否已完成学习：isCompleted 来自响应式共享进度状态
+// （见文件顶部导入），测验通过后侧边栏勾号与进度立即刷新
 
 // 计算每本书的学习进度百分比
 function getBookProgress(book) {

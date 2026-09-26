@@ -27,6 +27,8 @@ import bookImages from '../data/bookImages.js'
 import BookFigure from '../components/handbook/BookFigure.vue'
 // 导入知识点数据
 import { allTopics } from '../data/topics.js'
+// 导入学习进度共享状态：测验通过后立即响应刷新
+import { isCompleted as isTopicCompleted, markCompleted } from '../composables/useProgress.js'
 
 // 定义组件接收的属性
 const props = defineProps({
@@ -48,7 +50,8 @@ const topic = computed(() => {
 
 // 是否已完成该知识点的学习（答对测验）
 const isCompleted = computed(() => {
-  return localStorage.getItem(`dl-completed-${props.topicId}`) === 'true'
+  // 从响应式进度状态读取，测验通过后按钮文案立即变化
+  return isTopicCompleted(props.topicId)
 })
 
 // 获取当前知识点所属书籍的信息
@@ -109,9 +112,10 @@ function highlightTerms(html) {
       }
       // 代码块等内部不做术语标记
       if (skipDepth > 0) return part
-      // 用函数形式替换，避免术语含 $ 等字符时被误当作特殊替换模式
+      // 用函数形式替换，避免术语含 $ 等字符时被误当作特殊替换模式。
+      // role=button + tabindex 让键盘用户也能 Tab 聚焦后回车打开术语解释
       return part.replace(termRegex, term =>
-        `<span class="term-highlight" data-term="${term}">${term}</span>`
+        `<span class="term-highlight" role="button" tabindex="0" data-term="${term}">${term}</span>`
       )
     })
     .join('')
@@ -135,6 +139,33 @@ const activeTerm = ref(null)
 // 弹窗位置
 const termPosition = ref({ top: 0, left: 0 })
 
+// 打开某个术语的解释弹窗（点击与键盘回车共用）
+function openTerm(termEl) {
+  // 获取术语名称
+  const term = termEl.dataset.term
+  // 获取解释
+  const explanation = glossary[term]
+  if (!explanation) return
+
+  // 如果打开的是同一个术语，关闭弹窗
+  if (activeTerm.value && activeTerm.value.term === term) {
+    activeTerm.value = null
+    return
+  }
+
+  // 计算弹窗位置
+  const rect = termEl.getBoundingClientRect()
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+  const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
+
+  termPosition.value = {
+    top: rect.bottom + scrollTop + 8,
+    left: rect.left + scrollLeft
+  }
+  // 设置激活的术语
+  activeTerm.value = { term, explanation }
+}
+
 // 处理内容区域的点击事件（事件委托）
 function onContentClick(event) {
   // 查找被点击的术语元素
@@ -142,35 +173,18 @@ function onContentClick(event) {
   if (termEl) {
     // 阻止冒泡到 document，避免弹窗被立即关闭
     event.stopPropagation()
-    // 获取术语名称
-    const term = termEl.dataset.term
-    // 获取解释
-    const explanation = glossary[term]
-    if (!explanation) return
-
-    // 如果点击的是同一个术语，关闭弹窗
-    if (activeTerm.value && activeTerm.value.term === term) {
-      activeTerm.value = null
-      return
-    }
-
-    // 计算弹窗位置
-    const rect = termEl.getBoundingClientRect()
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
-
-    termPosition.value = {
-      top: rect.bottom + scrollTop + 8,
-      left: rect.left + scrollLeft
-    }
-    // 设置激活的术语
-    activeTerm.value = { term, explanation }
+    openTerm(termEl)
   }
 }
 
-// 关闭术语弹窗
-function closeTermPopover() {
-  activeTerm.value = null
+// 处理内容区域的键盘事件：聚焦术语后回车/空格打开解释
+function onContentKeydown(event) {
+  if (event.key !== 'Enter' && event.key !== ' ') return
+  const termEl = event.target.closest('.term-highlight')
+  if (!termEl) return
+  // 阻止空格滚动页面、回车触发外层点击
+  event.preventDefault()
+  openTerm(termEl)
 }
 
 // 点击页面其他区域关闭弹窗
@@ -191,8 +205,8 @@ onUnmounted(() => {
 
 // 测验通过回调
 function onQuizPassed() {
-  // 将完成状态存入 localStorage
-  localStorage.setItem(`dl-completed-${props.topicId}`, 'true')
+  // 写入共享进度状态（同步 localStorage 并触发全站刷新）
+  markCompleted(props.topicId)
 }
 
 // 打开测验弹窗
@@ -233,12 +247,13 @@ function openQuiz() {
     <!-- 音频播报播放器 -->
     <AudioPlayer :topicId="topicId" :title="topic.title" />
 
-    <!-- 内容章节（点击术语触发解释弹窗） -->
+    <!-- 内容章节（点击术语触发解释弹窗，键盘回车/空格同样支持） -->
     <section
       v-for="(section, idx) in topic.sections"
       :key="idx"
       class="content-section"
       @click="onContentClick"
+      @keydown="onContentKeydown"
     >
       <!-- 章节标题 -->
       <h2 class="section-title">{{ section.title }}</h2>
@@ -250,7 +265,7 @@ function openQuiz() {
     </section>
 
     <!-- 引言区域也支持术语点击 -->
-    <section class="intro-section" @click="onContentClick">
+    <section class="intro-section" @click="onContentClick" @keydown="onContentKeydown">
       <!-- 引言文字（衬线字体，大字号），v-html 渲染使术语可点击 -->
       <p class="intro-text" v-html="renderIntro(topic.intro)"></p>
     </section>
@@ -674,6 +689,21 @@ function openQuiz() {
   /* 靛青浅底 */
   border-bottom-style: solid;
   /* 实线下划线 */
+}
+
+/* 术语键盘聚焦效果：与悬停一致的高亮 + 焦点描边 */
+.section-content :deep(.term-highlight:focus-visible),
+.intro-text :deep(.term-highlight:focus-visible) {
+  background: var(--accent-soft);
+  /* 靛青浅底 */
+  border-bottom-style: solid;
+  /* 实线下划线 */
+  outline: 2px solid var(--accent);
+  /* 靛青描边 */
+  outline-offset: 1px;
+  /* 描边与文字的间距 */
+  border-radius: 2px;
+  /* 描边微圆角 */
 }
 </style>
 
