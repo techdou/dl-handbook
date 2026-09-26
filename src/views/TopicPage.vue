@@ -19,8 +19,6 @@ import PageNav from '../components/handbook/PageNav.vue'
 // 上/下一页导航组件
 import AudioPlayer from '../components/handbook/AudioPlayer.vue'
 // 音频播报播放器组件
-import TermPopover from '../components/handbook/TermPopover.vue'
-// 术语解释气泡组件
 // 导入术语表数据
 import glossary from '../data/glossary.js'
 // 导入书籍图片映射数据
@@ -75,24 +73,61 @@ marked.setOptions({
   // 支持 GitHub 风格 Markdown
 })
 
+// 术语标记需要跳过的标签：代码/脚本/样式内部出现的术语不做高亮
+const TERM_SKIP_TAGS = new Set(['pre', 'code', 'script', 'style'])
+
+// 构建术语匹配正则：按长度降序合并为单个交替正则
+// 单趟扫描 + 长术语在先，保证"卷积神经网络"整体命中，不会被"卷积"截断；
+// 替换插入的 HTML 也不会被后续术语重复扫描
+const termRegex = (() => {
+  const terms = Object.keys(glossary).sort((a, b) => b.length - a.length)
+  if (!terms.length) return null
+  const pattern = terms
+    .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|')
+  return new RegExp(pattern, 'g')
+})()
+
+// 在已渲染的 HTML 上标记术语：只在"文本片段"里替换，绝不触碰标签与属性。
+// 旧实现逐个术语对整段 HTML 做全局替换，短术语会命中长术语已生成的
+// data-term="..." 属性并破坏 HTML 结构，页面上出现 `术语">术语` 的重复文字
+function highlightTerms(html) {
+  if (!html || !termRegex) return html
+  // 是否处于需要跳过的标签内部（如 <pre><code> 代码块）
+  let skipDepth = 0
+  // 以标签为界切分 HTML：捕获组让 <tag> 本身也保留在数组中
+  return html
+    .split(/(<[^>]+>)/)
+    .map(part => {
+      // 标签片段：原样保留，同时跟踪是否进入需跳过的标签
+      if (part.startsWith('<')) {
+        const tag = /^<(\/?)([a-zA-Z][a-zA-Z0-9-]*)/.exec(part)
+        if (tag && TERM_SKIP_TAGS.has(tag[2].toLowerCase())) {
+          skipDepth += tag[1] === '/' ? -1 : 1
+        }
+        return part
+      }
+      // 代码块等内部不做术语标记
+      if (skipDepth > 0) return part
+      // 用函数形式替换，避免术语含 $ 等字符时被误当作特殊替换模式
+      return part.replace(termRegex, term =>
+        `<span class="term-highlight" data-term="${term}">${term}</span>`
+      )
+    })
+    .join('')
+}
+
 // 使用 marked 将 Markdown 转换为 HTML，并标记术语
 function renderMarkdown(text) {
   if (!text) return ''
-  // 调用 marked.parse 渲染完整 Markdown
-  let html = marked.parse(text)
-  // 将术语表中的术语替换为带标记的可点击 span
-  // 按术语长度降序排列，避免短术语覆盖长术语
-  const sortedTerms = Object.keys(glossary).sort((a, b) => b.length - a.length)
-  for (const term of sortedTerms) {
-    // 只替换不在 HTML 标签内的文本
-    // 使用正则匹配：不在 < 和 > 之间的术语
-    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    const regex = new RegExp(`(?<![<\\/\\w])${escapedTerm}(?![\\w>])`, 'g')
-    html = html.replace(regex,
-      `<span class="term-highlight" data-term="${term}">${term}</span>`
-    )
-  }
-  return html
+  // 调用 marked.parse 渲染完整 Markdown，再做术语标记
+  return highlightTerms(marked.parse(text))
+}
+
+// 引言是单段行内文本：用 parseInline 避免生成多余 <p> 标签，同样支持术语标记
+function renderIntro(text) {
+  if (!text) return ''
+  return highlightTerms(marked.parseInline(text))
 }
 
 // 当前显示的术语弹窗信息
@@ -216,8 +251,8 @@ function openQuiz() {
 
     <!-- 引言区域也支持术语点击 -->
     <section class="intro-section" @click="onContentClick">
-      <!-- 引言文字（衬线字体，大字号） -->
-      <p class="intro-text">{{ topic.intro }}</p>
+      <!-- 引言文字（衬线字体，大字号），v-html 渲染使术语可点击 -->
+      <p class="intro-text" v-html="renderIntro(topic.intro)"></p>
     </section>
 
     <!-- 书籍插图区域：展示对应书籍章节的示意图 -->
