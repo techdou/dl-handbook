@@ -8,6 +8,9 @@
 import { ref, onMounted, watch } from 'vue'
 // 导入 KaTeX 库：高质量数学公式渲染引擎
 import katex from 'katex'
+// 导入 KaTeX 配套样式：与 npm 安装的 JS 同版本，避免 CDN 版本错位
+// （原来 index.html 引的是 0.16.9 的 CSS 而 JS 是 0.17.0，字体度量可能不一致）
+import 'katex/dist/katex.min.css'
 
 // 定义组件接收的属性
 const props = defineProps({

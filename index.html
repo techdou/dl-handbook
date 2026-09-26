@@ -9,23 +9,13 @@
   <!-- 网站图标：SVG 格式 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <!-- 视口设置：适配移动端，初始缩放比例 1:1 -->
+  <meta name="description" content="深度学习入门 Handbook：四本书、19 个知识点的交互式深度学习学习手册，含公式推导、交互演示与随堂测验。" />
+  <!-- 页面描述：搜索结果/社交分享摘要 -->
   <title>深度学习入门 Handbook</title>
-  <!-- 页面标题：浏览器标签页显示 -->
-
-  <!-- Google Fonts 预连接：加速字体加载 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <!-- 预连接字体 API 服务器 -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- 预连接字体静态资源服务器，crossorigin 允许跨域 -->
-
-  <!-- 加载字体：衬线体（正文/标题）+ 等宽体（代码/公式） -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-  <!-- Noto Serif SC：中文衬线体（教科书感）
-       JetBrains Mono：等宽字体（代码/数字）
-       Source Serif 4：英文衬线体（学术风格） -->
-
-  <!-- KaTeX 数学公式渲染库的 CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <!-- 页面标题：路由切换时由 router.afterEach 按知识点动态更新 -->
+  <!-- 字体（Noto Serif SC / Source Serif 4 / JetBrains Mono）与 KaTeX 样式
+       均已改为 npm 自托管（见 src/main.js 与 FormulaBlock.vue），
+       不再从 Google Fonts / jsdelivr CDN 加载，国内访问更稳定 -->
 </head>
 <body>
   <!-- 页面主体 -->

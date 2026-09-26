@@ -9,6 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/noto-serif-sc": "^5.3.0",
+    "@fontsource/source-serif-4": "^5.3.0",
     "@react-spring/web": "^10.1.1",
     "@visx/axis": "^4.0.0",
     "@visx/grid": "^4.0.0",
