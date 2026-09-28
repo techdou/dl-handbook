@@ -58,7 +58,9 @@ const audioMap = {
   'rl-basics': '16_rl_basics.mp3',
   'mdp': '17_mdp.mp3',
   'q-learning': '18_q_learning.mp3',
-  'dqn': '19_dqn.mp3'
+  'dqn': '19_dqn.mp3',
+  'cnn-architectures': '20_cnn_architectures.mp3',
+  'transformer': '21_transformer.mp3'
 }
 
 // 计算音频文件路径

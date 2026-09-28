@@ -8,11 +8,13 @@
 
 ## 项目特点
 
-- **四本书 · 19 个知识点**：感知机 → 自制框架 → NLP → 强化学习，循序渐进
-- **19 个可交互演示**：每个知识点配一个 React 可视化，数学真实计算、动画平滑过渡
-- **学术笔记本风格**：暖白纸张 + 衬线字体 + 靛青点缀，长时间阅读不疲劳
+- **四本书 · 21 个知识点**：感知机 → 自制框架 → NLP（含 Transformer）→ 强化学习，循序渐进
+- **19 个可交互演示**：每个知识点配一个 React 可视化，数学真实计算、动画平滑过渡（新增主题复用既有演示）
+- **学术笔记本风格**：暖白纸张 + 衬线字体（自托管，无外部 CDN 依赖）+ 靛青点缀，长时间阅读不疲劳
 - **响应式设计**：桌面端侧边栏导航，移动端抽屉式菜单
 - **TTS 语音讲解**：每个知识点配有 AI 生成的朗读音频（可选）
+- **学习闭环**：随堂测验（逐题解析 + 完成度点亮）、一句话总结卡、⚠️ 常见误区、前置/进阶知识导航、正文术语点击解释
+- **性能优化**：路由与演示按需加载（首屏 JS 瘦身约 80%）、音频 MP3 压缩
 
 ## 技术架构
 
@@ -43,28 +45,28 @@ src/
 │   │   ├── AudioPlayer.vue      # 语音讲解播放器
 │   │   ├── BookFigure.vue       # 书籍插图展示
 │   │   ├── FormulaBlock.vue     # KaTeX 公式渲染
-│   │   ├── QuizModal.vue        # 随堂测验
-│   │   ├── TermPopover.vue      # 术语弹窗
+│   │   ├── QuizModal.vue        # 随堂测验（含逐题解析）
 │   │   └── PageNav.vue          # 页面导航
-│   └── demos/             # 独立 React 交互演示组件（单文件自包含）
-│       ├── DemoRegistry.tsx     # demoId → 组件 映射表
+│   ├── composables/
+│   │   └── useProgress.js      # 学习进度响应式状态
+│   └── demos/             # 独立 React 交互演示组件（单文件自包含，按需动态加载）
 │       ├── PerceptronDemo.tsx   # 感知机：训练线性决策边界
 │       ├── OptimizerDemo.tsx    # 优化器：d3-contour 等高线 + 梯度下降路径
 │       ├── DqnDemo.tsx          # DQN：真实 Q-Learning 训练网格世界
-│       └── ...（共 19 个）
+│       └── ...（共 19 个，经 ReactDemoHost 按需加载）
 ├── views/                 # 页面
 │   ├── HomePage.vue
 │   ├── LearningPath.vue
 │   └── TopicPage.vue
 ├── data/                  # 知识点内容数据
-│   ├── topics.js          # 19 个知识点结构化内容
+│   ├── topics.js          # 21 个知识点结构化内容
 │   ├── glossary.js        # 术语表
 │   └── bookImages.js      # 书籍插图映射
 └── assets/
     └── main.css           # 全局设计令牌 + 样式
 ```
 
-## 19 个交互演示一览
+## 交互演示一览
 
 | # | 知识点 | 演示亮点 |
 |---|---|---|
@@ -87,6 +89,8 @@ src/
 | 17 | MDP | 贝尔曼方程真实求解状态价值 |
 | 18 | Q-Learning | 真实 TD 更新公式 + 学习率调节 |
 | 19 | DQN | 真实 Q-Learning 训练 + 热力图 + reward 曲线 |
+
+> 「经典 CNN 架构」以正文与公式为主；「Transformer」复用 #15 的 Attention 演示。
 
 ## 本地开发
 
